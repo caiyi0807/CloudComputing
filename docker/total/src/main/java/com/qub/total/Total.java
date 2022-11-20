@@ -1,39 +1,35 @@
 package com.qub.total;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
+@NoArgsConstructor
+@Data
+@Document("TotalFunction")
 public class Total {
+
+    //@Indexed
+    @Id
+    @AutoIncKey
+    private Integer id=0;
+    @Field("total_marks")
     private int total_marks;
+    @Field("marks")
     private String[] marks;
+    @Field("modules")
     private String[] modules;
-
-    public Total(String[] marks, String[] modules) {
-        this.marks = marks;
-        this.modules = modules;
+    private boolean error;
+    private ArrayList<String> errorInformation=new ArrayList<>();
+    public Total(String[] marks, String[] modules, boolean error, ArrayList<String> errorInformation, int i) {
+        this.marks=marks;
+        this.modules=modules;
+        this.error=error;
+        this.errorInformation=errorInformation;
+        this.total_marks=i;
     }
-
-    public String[] getMarks() {
-        return marks;
-    }
-
-    public void setMarks(String[] marks) {
-        this.marks = marks;
-    }
-
-    public String[] getModules() {
-        return modules;
-    }
-
-    public void setModules(String[] modules) {
-        this.modules = modules;
-    }
-
-    public int getTotal_marks() {
-        return total_marks;
-    }
-
-    public void setTotal_marks(int total_marks) {
-        this.total_marks = total_marks;
-    }
-
     public int total(String mark[]){
         int totalMarks=0;
         for(int i=0;i<mark.length;i++){
@@ -41,7 +37,8 @@ public class Total {
                 totalMarks+=0;
             else totalMarks+=Integer.parseInt(marks[i]);
         }
-        return  totalMarks;
+        this.total_marks=totalMarks;
+        return totalMarks;
     }
 
 }
