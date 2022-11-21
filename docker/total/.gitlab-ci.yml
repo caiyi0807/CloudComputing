@@ -1,0 +1,32 @@
+image: maven:latest
+
+stages:
+  - build
+  - test
+  - deploy  
+
+cache:   
+    paths: 
+        - target/   
+        
+build:   
+    stage: build    
+    script:  
+        - mvn compile 
+
+test:   
+    stage: test    
+    script:  
+        - mvn test
+        
+deploy:
+    stage: deploy
+    image: jonaskello/rancher-cli-k8s:v2.0.4
+    script:
+        - wget https://releases.rancher.com/cli2/v2.3.2/rancher-linux-amd64-v2.3.2.tar.gz
+        - tar -zxf rancher-linux-amd64-v2.3.2.tar.gz
+        - mv rancher-v2.3.2/rancher /usr/bin/rancher
+        - rm -rf rancher-v2.3.2/
+        - echo yes | rancher login https://rancher.hal.davecutting.uk/p/c-fdg49:p-7n7crl --token token-2lqgd:sz9rn6bnpnsllv29xtjq8vbjdf9l2qhxp4v8nl4c7xtknxszt9xgqn 
+        - sed -i 's^${image_tag}^'"$CI_PIPELINE_ID^g" deployment.yaml
+        - rancher kubectl --namespace=hello40339781 apply -f ./deployment.yaml
