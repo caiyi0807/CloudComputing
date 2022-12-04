@@ -19,6 +19,7 @@ test:
     script:  
         - mvn test
         
+        
 deploy:
     stage: deploy
     image: jonaskello/rancher-cli-k8s:v2.0.4

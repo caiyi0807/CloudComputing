@@ -1,25 +1,15 @@
 package com.qub.total;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 @NoArgsConstructor
 @Data
-@Document("TotalFunction")
 public class Total {
 
-    //@Indexed
-    @Id
-    @AutoIncKey
     private Integer id=0;
-    @Field("total_marks")
     private int total_marks;
-    @Field("marks")
     private String[] marks;
-    @Field("modules")
     private String[] modules;
     private boolean error;
     private ArrayList<String> errorInformation=new ArrayList<>();

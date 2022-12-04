@@ -1,29 +1,22 @@
 package com.qub.total;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
-import java.io.IOException;
 
 
-@SpringBootApplication
 @RestController
-@Slf4j
+@SpringBootApplication
 public class TotalApplication {
     public static void main(String[] args) {
         SpringApplication.run(TotalApplication.class, args);
     }
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-    @RequestMapping(value = {"/"}, method = {RequestMethod.GET}, produces = "application/json;charset=UTF-8")
+    @RequestMapping("/")
     public Total getTotal(@RequestParam(value = "module_1", defaultValue = "") String module_1, @RequestParam(value = "mark_1", defaultValue = "") String mark_1,
                           @RequestParam(value = "module_2", defaultValue = "") String module_2, @RequestParam(value = "mark_2", defaultValue = "") String mark_2,
                           @RequestParam(value = "module_3", defaultValue = "") String module_3, @RequestParam(value = "mark_3", defaultValue = "") String mark_3,
@@ -72,11 +65,9 @@ public class TotalApplication {
         }
         Total total = new Total(marks, modules, error, errorInformation, 0);
         total.total(marks);
-        if (error == false)
-            mongoTemplate.insert(total, "TotalFunction");
+        writeDataToFile(total.toString()+'\n');
         return total;
     }
-
     public static boolean isNumeric(String str) {
         for (int i = str.length(); --i >= 0; ) {
             if (!Character.isDigit(str.charAt(i))) {
@@ -84,6 +75,70 @@ public class TotalApplication {
             }
         }
         return true;
+    }
+    public void writeDataToFile(String s) throws IOException {
+        FileOutputStream o = null;
+        String path = "1.txt";
+        byte[] buff = new byte[]{};
+        try {
+            File file = new File(path + path);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            buff = s.getBytes();
+            o = new FileOutputStream(file, true);
+            o.write(buff);
+            o.flush();
+            o.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping("/history")
+    public void history(HttpServletResponse response) throws IOException {
+        String filePath = "1.txt";
+        System.out.println("filePath:" + filePath);
+        File f = new File(filePath);
+        if (!f.exists()) {
+            response.sendError(404, "File not found!");
+            return;
+        }
+        BufferedInputStream br = new BufferedInputStream(new FileInputStream(f));
+        byte[] bs = new byte[1024];
+        int len = 0;
+        response.reset();
+        URL u = new URL("file:///" + filePath);
+        String contentType = u.openConnection().getContentType();
+        response.setContentType(contentType);
+        OutputStream out = response.getOutputStream();
+        while ((len = br.read(bs)) > 0) {
+            out.write(bs, 0, len);
+        }
+        out.flush();
+        out.close();
+        br.close();
+    }
+
+    @RequestMapping("/clear")
+    public void clear(){
+        FileOutputStream o = null;
+        String path = "";
+        String filename = "1.txt";
+        byte[] buff = new byte[]{};
+        try {
+            File file = new File(path + filename);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            buff = " ".getBytes();
+            o = new FileOutputStream(file, false);
+            o.write(buff);
+            o.flush();
+            o.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -1,4 +1,0 @@
-Spring:
-  data:
-    mongodb:
-      uri: mongodb://root:123456@192.168.0.16:27017/webapp?authSource=admin

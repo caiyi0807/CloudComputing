@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gwt-servlet.jar-2.3.2-redhat">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/gwt-servlet.jar-2.3.2-redhat.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

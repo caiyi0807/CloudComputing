@@ -1,4 +1,6 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, Response, make_response
+
+import average
 import json
 
 app = Flask(__name__)
@@ -27,6 +29,7 @@ def getAverage():
             error = True
             j = j + 1
             errorInformation.append("Please input the name of module_" + str(j) + ".")
+            continue
         j = j + 1
     i = 0
     sum = 0
@@ -35,50 +38,54 @@ def getAverage():
         marks[i] = marks[i].strip()
         if marks[i] == '':
             error = True
-            i = i + 1
+            i=i+1
             errorInformation.append("Please input value for mark_" + str(i) + ".")
             continue
         if not marks[i].isdigit():
             error = True
-            marks[i] = "";
-            i = i + 1
+            marks[i] = ""
+            i=i+1
             errorInformation.append("Please input integer for mark_" + str(i) + " and it should be greater than 0.")
             continue
         if int(marks[i]) > 100:
             error = True
-            marks[i] = "";
-            i = i + 1
+            marks[i] = ""
+            i=i+1
             errorInformation.append("Mark_" + str(i) + " should be less than 100.")
             continue
         else:
             sum += int(marks[i])
             num = num + 1
         i = i + 1
-    if num == 0:
-        average = 0
-    else:
-        average = sum / num
-    write = {'error': error, 'marks': marks, 'modules': modules, 'average': average,
-             'errrorInformation': errorInformation}
-    res = make_response(write)
-    res.status = '200'
-    res.headers['Access-Control-Allow-Origin'] = "*"
-    res.headers['Content-Type'] = 'application/json'
+    averagemark = average.averageMark(sum, num)
+    r = {
+        "error": error,
+        "marks": marks,
+        "modules": modules,
+        "average": averagemark,
+        "errrorInformation": errorInformation
+    }
+    reply = json.dumps(r)
+    response = Response(response=reply, status=200, mimetype='application/json')
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Content-Type"] = "application/json"
+    # return response
 
     with open('text01.txt', 'a') as file_read:
-        json.dump(write, file_read)
-        file_read.write('\n')
-    return res
+        file_read.write(reply)
+        file_read.write(',')
+    return response
 
 
 @app.route("/history")
 def Read():
     with open('text01.txt', 'r') as file_read:
         content = file_read.read()
-    res = make_response(content.replace('\n', ',').strip(','))
-    res.headers['Access-Control-Allow-Origin'] = "*"
-    res.headers['Content-Type'] = 'application/json'
-    return res
+    # res = make_response(content.replace('\n', ',').strip(','))
+    # res.headers['Access-Control-Allow-Origin'] = "*"
+    # res.headers['Content-Type'] = 'application/json'
+    response=Response(response=content.strip(','),status=200,mimetype='application/json')
+    return response
 
 
 @app.route("/clear")
@@ -90,5 +97,5 @@ def Clear():
     res.headers['Content-Type'] = 'application/json'
     return res
 
-if __name__=="__main__":
-    app.run(debug=True,host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0')

@@ -1,5 +1,7 @@
 package com.example.media;
 
+import com.example.media.web.Media;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +16,17 @@ import java.util.ArrayList;
 @SpringBootApplication
 @RestController
 public class MediaApplication {
-// 	@Autowired
-// 	private MongoTemplate mongoTemplate;
 	public static void main(String[] args) {
 		SpringApplication.run(MediaApplication.class, args);
 	}
-	@RequestMapping(value = {"/"}, method = {RequestMethod.GET}, produces = "application/json;charset=UTF-8")
+
+	@RequestMapping("/")
 	public Media getTotal(@RequestParam(value = "module_1", defaultValue = "") String module_1, @RequestParam(value = "mark_1", defaultValue = "") String mark_1,
 						  @RequestParam(value = "module_2", defaultValue = "") String module_2, @RequestParam(value = "mark_2", defaultValue = "") String mark_2,
 						  @RequestParam(value = "module_3", defaultValue = "") String module_3, @RequestParam(value = "mark_3", defaultValue = "") String mark_3,
 						  @RequestParam(value = "module_4", defaultValue = "") String module_4, @RequestParam(value = "mark_4", defaultValue = "") String mark_4,
 						  @RequestParam(value = "module_5", defaultValue = "") String module_5, @RequestParam(value = "mark_5", defaultValue = "") String mark_5,
-						  HttpServletResponse response,HttpServletRequest request
+						  HttpServletResponse response, HttpServletRequest request
 	) throws IOException {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		String[] marks = {mark_1, mark_2, mark_3, mark_4, mark_5};
@@ -66,12 +67,16 @@ public class MediaApplication {
 				errorInformation.add(s);
 			}
 		}
-		Media media = new Media(marks, modules, error, errorInformation);
-		double mediaMark = media.media(marks);
+		Media media=new Media(marks,modules,error,errorInformation);
+//		media.setMarks(marks);
+//		media.setError(error);
+//		media.setModules(modules);
+//		media.setErrorInformation(errorInformation);
+		int len=marks.length;
+		media.media(marks,len);
 		HttpSession session = request.getSession();
 		session.setMaxInactiveInterval(60*30);
-		session.setAttribute("media",media);
-		//mongoTemplate.insert(media, "MedidaFunction");
+		session.setAttribute("median",media);
 		return media;
 	}
 	public static boolean isNumeric(String str) {
@@ -82,6 +87,13 @@ public class MediaApplication {
 		}
 		return true;
 	}
+	@Autowired
+	HttpServletRequest request;
 
+	@RequestMapping("/history")
+	public Media test() {
+		Media media = (Media) request.getSession().getAttribute("median");
+		return media;
+	}
 
 }

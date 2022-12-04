@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "poxyurl",
+      "type": "qub.ac.uk.poxy.PoxyUrl",
+      "sourceType": "qub.ac.uk.poxy.PoxyUrl"
+    }
+  ],
+  "properties": [
+    {
+      "name": "poxyurl.services",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "qub.ac.uk.poxy.PoxyUrl"
+    },
+    {
+      "name": "poxyurl.target-url",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "qub.ac.uk.poxy.PoxyUrl"
+    }
+  ],
+  "hints": []
+}
